@@ -21,6 +21,10 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
+      visibleUntil: {
+        defaultValue: null,
+        type: Sequelize.DATE
+      },
       order: {
         type: Sequelize.INTEGER
       },
