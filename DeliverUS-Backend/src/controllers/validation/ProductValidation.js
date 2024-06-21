@@ -14,6 +14,17 @@ const checkRestaurantExists = async (value, { req }) => {
     return Promise.reject(new Error(err))
   }
 }
+
+const checkAvailabilityIsTrue = async (value, { req }) => {
+  try {
+    if(req.body.availability === false && value !== null) {
+      return Promise.reject(new Error('Cannot set the availability and visibility at the same time'))
+    } else { return Promise.resolve() }
+  } catch (err) {
+    return Promise.reject(new Error(err))
+  }
+}
+
 const create = [
   check('name').exists().isString().isLength({ min: 1, max: 255 }).trim(),
   check('description').optional({ checkNull: true, checkFalsy: true }).isString().isLength({ min: 1 }).trim(),
@@ -21,6 +32,10 @@ const create = [
   check('order').default(null).optional({ nullable: true }).isInt().toInt(),
   check('availability').optional().isBoolean().toBoolean(),
   check('productCategoryId').exists().isInt({ min: 1 }).toInt(),
+
+  check('visibleUntil').optional().isDate().toDate(),
+  check('visibleUntil').custom(checkAvailabilityIsTrue),
+
   check('restaurantId').exists().isInt({ min: 1 }).toInt(),
   check('restaurantId').custom(checkRestaurantExists),
   check('image').custom((value, { req }) => {
@@ -38,6 +53,10 @@ const update = [
   check('order').default(null).optional({ nullable: true }).isInt().toInt(),
   check('availability').optional().isBoolean().toBoolean(),
   check('productCategoryId').exists().isInt({ min: 1 }).toInt(),
+
+  check('visibleUntil').optional().isDate().toDate(),
+  check('visibleUntil').custom(checkAvailabilityIsTrue),
+
   check('restaurantId').not().exists(),
   check('image').custom((value, { req }) => {
     return checkFileIsImage(req, 'image')
