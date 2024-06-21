@@ -20,6 +20,19 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
     fetchRestaurantDetail()
   }, [route])
 
+  const isAboutToBeInvisible = (deadline) => {
+    console.log(deadline)
+    console.log(typeof (deadline))
+    const currentDate = new Date()
+    const deadlineDate = new Date(deadline)
+
+    const timeDiff = deadlineDate.getTime() - currentDate.getTime()
+
+    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24))
+
+    return daysLeft <= 7
+  }
+
   const renderHeader = () => {
     return (
       <View>
@@ -62,6 +75,9 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       >
         <TextRegular numberOfLines={2}>{item.description}</TextRegular>
         <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€</TextSemiBold>
+        {item.visibleUntil !== null && isAboutToBeInvisible(item.visibleUntil) &&
+          <TextRegular textStyle={ styles.visibility }>Is about to dissapear!</TextRegular>
+        }
         {!item.availability &&
           <TextRegular textStyle={styles.availability }>Not available</TextRegular>
         }
@@ -228,6 +244,11 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginRight: 5,
     color: GlobalStyles.brandSecondary
+  },
+  visibility: {
+    textAlign: 'right',
+    marginRight: 5,
+    color: GlobalStyles.brandPrimary
   },
   actionButton: {
     borderRadius: 8,
